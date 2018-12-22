@@ -79,6 +79,20 @@ public class SillyHeadlessBrowser {
 			addCookies(url.getHost(), response.cookies());
 		}
 
+		if(response.hasHeader("Server")) {
+			if(response.header("Server").compareTo("cloudflare") == 0) {
+				LOGGER.info("Detected cloudflare protected request. Try to resolve the challenge");
+				String cloudflareUrl = CloudflareScraper.handleCloudflare(url, response);
+				response = Jsoup.connect(cloudflareUrl)
+					.userAgent(userAgent)
+					.ignoreHttpErrors(true)
+					.timeout(10000)
+					.followRedirects(true)
+					.cookies(this.getCookies(url))
+					.method(Connection.Method.GET)
+					.execute();
+			}
+		}
 
 		return response.parse();
 	}
