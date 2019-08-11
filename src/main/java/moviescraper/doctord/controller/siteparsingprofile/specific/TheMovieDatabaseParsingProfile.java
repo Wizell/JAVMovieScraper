@@ -54,13 +54,6 @@ public class TheMovieDatabaseParsingProfile extends SiteParsingProfileJSON imple
 	private final String movieImagePosterThumbnailPathPrefix = "https://image.tmdb.org/t/p/w185";
 
 	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.AMERICAN_ADULT_DVD_SCRAPER_GROUP);
-		return groupNames;
-	}
-
-	@Override
 	public Title scrapeTitle() {
 		JSONObject pageJSON = getMovieJSON();
 		if (pageJSON != null) {

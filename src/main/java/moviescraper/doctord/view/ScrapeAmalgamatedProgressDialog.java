@@ -28,21 +28,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import moviescraper.doctord.controller.amalgamation.Amalgamation;
 
 import org.apache.commons.lang3.StringUtils;
 
-import moviescraper.doctord.controller.amalgamation.AllAmalgamationOrderingPreferences;
-import moviescraper.doctord.controller.amalgamation.DataItemSourceAmalgamationPreference;
-import moviescraper.doctord.controller.amalgamation.MovieScrapeResultGroup;
 import moviescraper.doctord.controller.amalgamation.ScrapeAmalgamatedMovieWorker;
 import moviescraper.doctord.controller.amalgamation.ScrapeAmalgamatedMovieWorker.ScrapeAmalgamatedMovieWorkerProperty;
-import moviescraper.doctord.controller.amalgamation.ScraperGroupAmalgamationPreference;
 import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfile;
-import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfile.ScraperGroupName;
-import moviescraper.doctord.controller.siteparsingprofile.specific.Data18MovieParsingProfile;
-import moviescraper.doctord.controller.siteparsingprofile.specific.TheMovieDatabaseParsingProfile;
 import moviescraper.doctord.model.Movie;
 import moviescraper.doctord.model.SearchResult;
 import moviescraper.doctord.model.dataitem.DataItemSource;
@@ -66,9 +59,7 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 	int currentFileIndexToScrape = 0;
 	private static final int maxLettersToDisplayOfFileName = 80;
 	private AmalgamationPropertyChangeListener propertyListener;
-	private ScraperGroupAmalgamationPreference scraperGroupAmalgamationPreference;
 	private List<ScraperProgressView> scraperProgressViews;
-	AllAmalgamationOrderingPreferences allAmalgamationOrderingPreferences;
 
 	private List<File> filesWeAreScraping;
 	private JLabel fileBeingScrapedLabel;
@@ -76,16 +67,9 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 	private boolean showPosterPicker;
 	private boolean showFanartPicker;
 
-	//private final PropertyChangeSupport propertyChangeSupport;
+	private Amalgamation mixture;
 
-	public static void main(String[] args) {
-		DataItemSourceAmalgamationPreference overallOrdering = new DataItemSourceAmalgamationPreference(new TheMovieDatabaseParsingProfile(), new Data18MovieParsingProfile());
-		ScraperGroupAmalgamationPreference amalgamationPreferences = new ScraperGroupAmalgamationPreference(ScraperGroupName.AMERICAN_ADULT_DVD_SCRAPER_GROUP, overallOrdering);
-		GUIMain guiMain = new GUIMain();
-		ScrapeAmalgamatedProgressDialog action = new ScrapeAmalgamatedProgressDialog(guiMain, guiMain.getAllAmalgamationOrderingPreferences(), amalgamationPreferences);
-		// schedule this for the event dispatch thread (edt)
-		SwingUtilities.invokeLater(action);
-	}
+	//private final PropertyChangeSupport propertyChangeSupport;
 
 	public void setFilesBeingScrapedLabel() {
 		if (fileBeingScrapedLabel == null)
@@ -118,19 +102,17 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 		progressBar.setValue(0);
 	}
 
-	public ScrapeAmalgamatedProgressDialog(GUIMain guiMain, AllAmalgamationOrderingPreferences allAmalgamationOrderingPreferences,
-	        ScraperGroupAmalgamationPreference scraperGroupAmalgamationPreference) {
-		super(guiMain.getFrmMoviescraper());
-		setTitle("Scraping...");
+	public ScrapeAmalgamatedProgressDialog(GUIMain guiMain, Amalgamation mixture) {
+		super(guiMain.getFrmMoviescraper(), "Scraping...");
 		this.guiMain = guiMain;
+		this.mixture = mixture;
 		this.filesWeAreScraping = guiMain.getCurrentlySelectedMovieFileList();
-		this.allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences;
+		//this.allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences;
 		scraperProgressViews = new LinkedList<>();
 
 		showPosterPicker = MoviescraperPreferences.getInstance().getSelectArtManuallyWhenScraping();
 		showFanartPicker = MoviescraperPreferences.getInstance().getSelectArtManuallyWhenScraping();
 
-		this.scraperGroupAmalgamationPreference = scraperGroupAmalgamationPreference;
 		currentMovieList = new LinkedList<>();
 		propertyListener = new AmalgamationPropertyChangeListener();
 
@@ -179,12 +161,18 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 	}
 
 	private JPanel createScraperProgressPanel() {
+		
+		List<SiteParsingProfile> scrapers = mixture.getScrapers();
+		if(scrapers == null || scrapers.size() < 0) {
+			return null;
+		}
+
 		JPanel scraperProgressPanel = new JPanel();
 		scraperProgressPanel.setLayout(new BoxLayout(scraperProgressPanel, BoxLayout.Y_AXIS));
-		List<DataItemSource> activeScrapers = scraperGroupAmalgamationPreference.getActiveScrapersUsedInOverallPreference();
+
 		//update the state of what's active because it may have changed from elsewhere
 
-		for (DataItemSource currentScraper : activeScrapers) {
+		for (DataItemSource currentScraper : scrapers) {
 			if (currentScraper != null && currentScraper instanceof SiteParsingProfile && shouldScrapeThread(currentScraper)) {
 				ScraperProgressView currentProgressView = new ScraperProgressView(currentScraper, this);
 				scraperProgressPanel.add(currentProgressView);
@@ -197,21 +185,22 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 
 	private boolean shouldScrapeThread(DataItemSource parsingProfile) {
 		//Default group used for single scraper operations
-		if (scraperGroupAmalgamationPreference.getScraperGroupName().equals(ScraperGroupName.DEFAULT_SCRAPER_GROUP)) {
+		/*if (scraperGroupAmalgamationPreference.getScraperGroupName().equals(ScraperGroupName.DEFAULT_SCRAPER_GROUP)) {
 			return true;
-		}
-		for (ScraperGroupName currentName : ScraperGroupName.values()) {
+		}*/
+		/*for (ScraperGroupName currentName : ScraperGroupName.values()) {
 			ScraperGroupAmalgamationPreference currentPref = allAmalgamationOrderingPreferences.getScraperGroupAmalgamationPreference(currentName);
 
 			LinkedList<DataItemSource> overallPrefs = currentPref.getOverallAmalgamationPreference().getAmalgamationPreferenceOrder();
-
-			for (DataItemSource currentDataItemSource : overallPrefs) {
+*/
+			List<SiteParsingProfile> scrapers = mixture.getScrapers();
+			for (DataItemSource currentDataItemSource : scrapers) {
 				if (currentDataItemSource.getDataItemSourceName().equals(parsingProfile.getDataItemSourceName())) {
 					boolean disabled = currentDataItemSource.isDisabled();
 					return !disabled;
 				}
 			}
-		}
+		//}
 		return false;
 	}
 
@@ -224,8 +213,7 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 			if (propertyListener != null)
 				worker.removePropertyChangeListener(propertyListener);
 		}
-		worker = new ScrapeAmalgamatedMovieWorker(allAmalgamationOrderingPreferences, scraperGroupAmalgamationPreference, guiMain.getCurrentlySelectedMovieFileList().get(currentFileIndexToScrape),
-		        this);
+		worker = new ScrapeAmalgamatedMovieWorker(mixture.getScrapers() , guiMain.getCurrentlySelectedMovieFileList().get(currentFileIndexToScrape), this);
 		propertyListener = new AmalgamationPropertyChangeListener();
 		worker.addPropertyChangeListener(propertyListener);
 		worker.execute();
@@ -318,11 +306,10 @@ public class ScrapeAmalgamatedProgressDialog extends JDialog implements Runnable
 	public void updateAmalgamatedMovie() {
 		if (currentMovieList != null && currentMovieList.size() > 0) {
 			//we construct a new one instead of using our local variable to get around bug where changes to amalgamation settings were not getting picked up until program restart
-			ScraperGroupAmalgamationPreference prefToUse = guiMain.getAllAmalgamationOrderingPreferences()
-			        .getScraperGroupAmalgamationPreference(scraperGroupAmalgamationPreference.getScraperGroupName());
-			MovieScrapeResultGroup scrapedResultGroup = new MovieScrapeResultGroup(currentMovieList, prefToUse);
+			//ScraperGroupAmalgamationPreference prefToUse = guiMain.getAllAmalgamationOrderingPreferences().getScraperGroupAmalgamationPreference(scraperGroupAmalgamationPreference.getScraperGroupName());
 
-			currentAmalgamatedMovie = scrapedResultGroup.amalgamateMovie();
+			//currentAmalgamatedMovie = scrapedResultGroup.amalgamateMovie();
+			currentAmalgamatedMovie = (Movie)mixture.mix(currentMovieList);
 		}
 
 	}

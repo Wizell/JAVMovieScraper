@@ -60,13 +60,6 @@ public class JavLibraryParsingProfile extends SiteParsingProfile implements Spec
 
 	private static final SimpleDateFormat javLibraryReleaseDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
-	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.JAV_CENSORED_SCRAPER_GROUP);
-		return groupNames;
-	}
-
 	public String getOverrideURLJavLibrary() {
 		return overrideURLJavLibrary;
 	}

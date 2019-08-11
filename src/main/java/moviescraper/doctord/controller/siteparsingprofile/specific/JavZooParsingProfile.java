@@ -45,13 +45,6 @@ public class JavZooParsingProfile extends SiteParsingProfile implements Specific
 
 	private static final String siteLanguageToScrape = "en";
 
-	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.JAV_CENSORED_SCRAPER_GROUP);
-		return groupNames;
-	}
-
 	public JavZooParsingProfile(Document doc) {
 		super(doc);
 	}

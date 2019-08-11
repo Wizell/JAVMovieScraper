@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
-public class Settings {
+public abstract class Settings {
 
 	private final static Properties programPreferences = new Properties();
 	private static final String fileNameOfPreferences = "settings.xml";

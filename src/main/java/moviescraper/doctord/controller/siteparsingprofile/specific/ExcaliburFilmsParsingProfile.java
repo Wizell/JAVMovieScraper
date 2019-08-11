@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
@@ -45,13 +41,6 @@ import moviescraper.doctord.model.dataitem.Votes;
 import moviescraper.doctord.model.dataitem.Year;
 
 public class ExcaliburFilmsParsingProfile extends SiteParsingProfile implements SpecificProfile {
-
-	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.AMERICAN_ADULT_DVD_SCRAPER_GROUP);
-		return groupNames;
-	}
 
 	@Override
 	public Title scrapeTitle() {

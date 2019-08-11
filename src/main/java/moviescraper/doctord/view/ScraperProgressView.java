@@ -27,17 +27,17 @@ public class ScraperProgressView extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JLabel scraperNameLabel;
+	private final JLabel scraperNameLabel;
 
-	private JLabel scrapedMovieTitle;
+	private final JLabel scrapedMovieTitle;
 
-	private JButton progressButton;
+	private final JButton progressButton;
 
-	private DataItemSource scraper;
+	private final DataItemSource scraper;
 
-	private ScraperProgressPropertyChangeListener listener;
+	private final ScraperProgressPropertyChangeListener listener;
 
-	private ScrapeAmalgamatedProgressDialog parentDialog;
+	private final ScrapeAmalgamatedProgressDialog parentDialog;
 
 	public ScraperProgressView(DataItemSource scraper, ScrapeAmalgamatedProgressDialog parentDialog) {
 		//set up compenents

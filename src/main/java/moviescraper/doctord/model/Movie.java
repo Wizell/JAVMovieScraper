@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -39,16 +40,20 @@ import moviescraper.doctord.model.dataitem.*;
 import moviescraper.doctord.model.dataitem.Runtime;
 import moviescraper.doctord.model.preferences.MoviescraperPreferences;
 
-public class Movie {
+public class Movie extends ScrapeData{
 
 	/*
 	 * Be careful if you decide you want to change the field names in this class (especially the arrays)
 	 * because reflection is used in the movie amalgamation routine to get these fields by name, so you will need to
 	 * update the references in the reflective call with the new name as well.
-	 */
+	*/
+	@ScrapeField
 	private ArrayList<Actor> actors;
+	@ScrapeField
 	private ArrayList<Director> directors;
+	@ScrapeField
 	private Thumb[] fanart;
+	@ScrapeField
 	private Thumb[] extraFanart;
 	private Thumb preferredFanartToWriteToDisk;
 	private ArrayList<Genre> genres;
@@ -82,6 +87,34 @@ public class Movie {
 
 	private String fileName;
 
+	public Movie() {
+		actors = new ArrayList<>();
+		directors = new ArrayList<>();
+		fanart = new Thumb[0];
+		extraFanart = new Thumb[0];
+		genres = new ArrayList<>();
+		tags = new ArrayList<>();
+		id = ID.BLANK_ID;
+		mpaa = MPAARating.BLANK_RATING;
+		originalTitle = OriginalTitle.BLANK_ORIGINALTITLE;
+		outline = Outline.BLANK_OUTLINE;
+		plot = Plot.BLANK_PLOT;
+		posters = new Thumb[0];
+
+		rating = Rating.BLANK_RATING;
+		releaseDate = ReleaseDate.BLANK_RELEASEDATE;
+		runtime = Runtime.BLANK_RUNTIME;
+		set = Set.BLANK_SET;
+		sortTitle = SortTitle.BLANK_SORTTITLE;
+		studio = Studio.BLANK_STUDIO;
+		tagline = Tagline.BLANK_TAGLINE;
+		title = new Title("");
+		top250 = Top250.BLANK_TOP250;
+		trailer = Trailer.BLANK_TRAILER;
+		votes = Votes.BLANK_VOTES;
+		year = Year.BLANK_YEAR;
+	}
+	
 	public Movie(ArrayList<Actor> actors, ArrayList<Director> directors, Thumb[] fanart, Thumb[] extraFanart, ArrayList<Genre> genres, ArrayList<Tag> tags, ID id, MPAARating mpaa,
 	        OriginalTitle originalTitle, Outline outline, Plot plot, Thumb[] posters, Rating rating, ReleaseDate releaseDate, Runtime runtime, Set set, SortTitle sortTitle, Studio studio,
 	        Tagline tagline, Title title, Top250 top250, Trailer trailer, Votes votes, Year year) {
@@ -964,6 +997,14 @@ public class Movie {
 	 */
 	public boolean hasValidTitle() {
 		return (title != null && title.getTitle() != null && title.getTitle().length() > 0);
+	}
+	
+	public static List<Field> getClassScrapeFields() {
+		return ScrapeData.getClassScrapeFields(Movie.class);
+	}
+	
+	public static List<String> getClassScrapeFieldNames() {
+		return ScrapeData.getClassScrapeFieldNames(Movie.class);
 	}
 
 }

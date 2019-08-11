@@ -1,4 +1,4 @@
-package moviescraper.doctord.controller.amalgamation.test;
+package moviescraper.doctord.controller.amalgamation;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,19 +6,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import moviescraper.doctord.controller.amalgamation.DataItemSourceAmalgamationPreference;
-import moviescraper.doctord.controller.amalgamation.MovieScrapeResultGroup;
-import moviescraper.doctord.controller.amalgamation.ScraperGroupAmalgamationPreference;
-import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfile.ScraperGroupName;
 import moviescraper.doctord.controller.siteparsingprofile.specific.DmmParsingProfile;
 import moviescraper.doctord.controller.siteparsingprofile.specific.JavLibraryParsingProfile;
 import moviescraper.doctord.controller.siteparsingprofile.specific.R18ParsingProfile;
+import moviescraper.doctord.model.Anime;
 import moviescraper.doctord.model.Movie;
 
 public class TestAmalgamation {
@@ -27,7 +27,7 @@ public class TestAmalgamation {
 	static Movie r18SourcedMovie;
 	static Movie javLibrarySourcedMovie;
 	static Movie amalgamatedMovie;
-
+/*
 	@BeforeClass
 	public static void initialize() throws URISyntaxException, NoSuchFieldException, SecurityException {
 		System.out.println("Testing amalgamation");
@@ -101,6 +101,33 @@ public class TestAmalgamation {
 	@Test
 	public void testPlotGlobalSort() {
 		assertEquals("Wrong plot using a standard amalgamation", amalgamatedMovie.getPlot(), r18SourcedMovie.getPlot());
+	}
+	*/
+	@Test
+	public void serialize() {
+		try {
+			List amalgamations = new ArrayList();
+			amalgamations.add(new Amalgamation(new AmalgamationDefinition("test", Movie.class, null)));
+			amalgamations.add(new Amalgamation(new AmalgamationDefinition("test2", Movie.class, null)));
+			Amalgamation.save(amalgamations, "/tmp/test2.json");
+		} catch (ClassNotFoundException ex) {
+			Logger.getLogger(TestAmalgamation.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (InstantiationException ex) {
+			Logger.getLogger(TestAmalgamation.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (IllegalAccessException ex) {
+			Logger.getLogger(TestAmalgamation.class.getName()).log(Level.SEVERE, null, ex);
+		}
+
+	}
+	
+	@Test
+	public void Constructors() {
+		List<Amalgamation> list = new ArrayList<>();
+		Amalgamation<Movie> mixMovie = new Amalgamation("Movie", Movie.class, "");
+		list.add(mixMovie);
+		Amalgamation<Anime> mixWeb = new Amalgamation("Anime", Anime.class, "");
+		list.add(mixWeb);
+		System.out.println(list);
 	}
 
 }

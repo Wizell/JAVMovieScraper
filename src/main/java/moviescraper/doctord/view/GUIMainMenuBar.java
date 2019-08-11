@@ -29,10 +29,9 @@ import moviescraper.doctord.controller.PlayMovieAction;
 import moviescraper.doctord.controller.RefreshDirectoryAction;
 import moviescraper.doctord.controller.SelectAmalgamationSettingsAction;
 import moviescraper.doctord.controller.WriteFileDataAction;
-import moviescraper.doctord.controller.amalgamation.ScrapeAmalgamatedAction;
+import moviescraper.doctord.controller.amalgamation.ScrapeAction;
 import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfileItem;
 import moviescraper.doctord.controller.siteparsingprofile.SpecificProfileFactory;
-import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfile.ScraperGroupName;
 import moviescraper.doctord.model.Movie;
 import moviescraper.doctord.model.preferences.MoviescraperPreferences;
 
@@ -404,7 +403,7 @@ public class GUIMainMenuBar extends JMenuBar {
 		JMenu scrapeMenu = new JMenu("Scrape");
 		scrapeMenu.setMnemonic(KeyEvent.VK_S);
 
-		JMenuItem scrapeAdultDVDAmalgamated = new JMenuItem(
+		/*JMenuItem scrapeAdultDVDAmalgamated = new JMenuItem(
 		        new ScrapeAmalgamatedAction(guiMain, guiMain.getAllAmalgamationOrderingPreferences().getScraperGroupAmalgamationPreference(ScraperGroupName.AMERICAN_ADULT_DVD_SCRAPER_GROUP)));
 		scrapeAdultDVDAmalgamated.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK | Event.SHIFT_MASK));
 		scrapeAdultDVDAmalgamated.setIcon(GUIMainButtonPanel.initializeImageIcon("App"));
@@ -415,8 +414,8 @@ public class GUIMainMenuBar extends JMenuBar {
 		scrapeJAVAmalgamated.setIcon(GUIMainButtonPanel.initializeImageIcon("Japan"));
 
 		scrapeMenu.add(scrapeAdultDVDAmalgamated);
-		scrapeMenu.add(scrapeJAVAmalgamated);
-
+		scrapeMenu.add(scrapeJAVAmalgamated);*/
+		scrapeMenu.add(new JMenuItem("pouet"));
 		JMenu specificMenu = new JMenu("Specific Scrape");
 		scrapeMenu.add(specificMenu);
 
@@ -435,7 +434,7 @@ public class GUIMainMenuBar extends JMenuBar {
 					++i;
 				menuItem.setAccelerator(KeyStroke.getKeyStroke(Character.forDigit(i % 10, 10), Event.CTRL_MASK | Event.SHIFT_MASK));
 			}
-			menuItem.addActionListener(new ScrapeAmalgamatedAction(guiMain, item.getParser()));
+			menuItem.addActionListener(new ScrapeAction(guiMain, item.getParser()));
 			specificMenu.add(menuItem);
 		}
 

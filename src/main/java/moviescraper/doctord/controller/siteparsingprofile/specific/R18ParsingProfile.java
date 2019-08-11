@@ -57,13 +57,6 @@ public class R18ParsingProfile extends SiteParsingProfile implements SpecificPro
 	}
 
 	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.JAV_CENSORED_SCRAPER_GROUP);
-		return groupNames;
-	}
-
-	@Override
 	public Title scrapeTitle() {
 		Element titleElement = document.select("cite[itemprop=name]").first();
 		if (titleElement != null)

@@ -51,13 +51,6 @@ public class JavBusParsingProfile extends SiteParsingProfile implements Specific
 	private boolean isCensoredSearch = true;
 	private Document japaneseDocument;
 
-	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.JAV_CENSORED_SCRAPER_GROUP);
-		return groupNames;
-	}
-
 	private void initializeJapaneseDocument() {
 		if (japaneseDocument == null) {
 			String urlOfCurrentPage = document.location();

@@ -16,7 +16,6 @@ import java.awt.BorderLayout;
 import javax.swing.JList;
 
 import moviescraper.doctord.controller.SelectFileListAction;
-import moviescraper.doctord.controller.amalgamation.AllAmalgamationOrderingPreferences;
 import moviescraper.doctord.model.IconCache;
 import moviescraper.doctord.model.Movie;
 import moviescraper.doctord.model.SearchResult;
@@ -53,6 +52,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.stage.DirectoryChooser;
 import javax.swing.BoxLayout;
 import javax.swing.event.ListSelectionListener;
+import moviescraper.doctord.controller.amalgamation.Amalgamation;
 
 public class GUIMain {
 
@@ -68,7 +68,7 @@ public class GUIMain {
 	private File defaultHomeDirectory;
 	private MoviescraperPreferences preferences;
 	private GuiSettings guiSettings;
-	private AllAmalgamationOrderingPreferences allAmalgamationOrderingPreferences;
+	private List<Amalgamation> amalg;
 
 	//scraped movies
 	public List<Movie> movieToWriteToDiskList;
@@ -106,12 +106,6 @@ public class GUIMain {
 	private final static boolean debugMessages = false;
 	private GUIMainButtonPanel buttonPanel;
 
-	//JavaFX stuff
-	//Ignore warnings about this not being used. It is used for the file browser. 
-	//You can comment this variable out and you will see the file browsing no longer works :)
-	@SuppressWarnings("unused")
-	private final JFXPanel fxPanel = new JFXPanel(); //ensures the JavaFX library is loaded - allows us to use DirectoryChooser later on
-
 	/**
 	 * Launch the application.
 	 */
@@ -119,17 +113,33 @@ public class GUIMain {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				//System.out.println( UIManager.getl getSystemLookAndFeelClassName());
+				/*try {
+					for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+						if ("GTK".equals(info.getName())) {
+							javax.swing.UIManager.setLookAndFeel(info.getClassName());
+							break;
+						}
+					}
+				} catch (ClassNotFoundException ex) {
+					java.util.logging.Logger.getLogger(AmaSettingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				} catch (InstantiationException ex) {
+					java.util.logging.Logger.getLogger(AmaSettingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				} catch (IllegalAccessException ex) {
+					java.util.logging.Logger.getLogger(AmaSettingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+					java.util.logging.Logger.getLogger(AmaSettingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				}*/
 				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					//UIManager.setLookAndFeel(UIManager. getCrossPlatformLookAndFeelClassName());
 					//Prevent text area font from looking different than text field font
-					UIManager.getDefaults().put("TextArea.font", UIManager.getFont("TextField.font"));
+					//UIManager.getDefaults().put("TextArea.font", UIManager.getFont("TextField.font"));
 					GUIMain window = new GUIMain();
 					System.out.println("Gui Initialized");
 					window.frmMoviescraper.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(null, ExceptionUtils.getStackTrace(e), "Unhandled Exception", JOptionPane.ERROR_MESSAGE);
-
 				}
 			}
 		});
@@ -152,9 +162,7 @@ public class GUIMain {
 	 */
 	public void reinitializeAmalgamationPreferencesFromFile() {
 
-		allAmalgamationOrderingPreferences = new AllAmalgamationOrderingPreferences();
-
-		allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences.initializeValuesFromPreferenceFile();
+		//allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences.initializeValuesFromPreferenceFile();
 
 	}
 
@@ -167,6 +175,7 @@ public class GUIMain {
 		guiSettings = GuiSettings.getInstance();
 
 		reinitializeAmalgamationPreferencesFromFile();
+		amalg = Amalgamation.load("test.json");
 
 		setCurrentlySelectedNfoFileList(new ArrayList<File>());
 		setCurrentlySelectedMovieFileList(new ArrayList<File>());
@@ -700,20 +709,14 @@ public class GUIMain {
 	}
 
 	public boolean showAmalgamationSettingsDialog() {
-		AmalgamationSettingsDialog dialog = new AmalgamationSettingsDialog(this, getAllAmalgamationOrderingPreferences());
-		return dialog.show();
+		AmaSettingDialog dialog = new AmaSettingDialog();
+		dialog.setVisible(true);
+		
+		return true;
 	}
 
-	public AllAmalgamationOrderingPreferences getAllAmalgamationOrderingPreferences() {
-		//rereading from file in case external program somehow decides to change this file before we get it.
-		//also this fixes a bug where canceling a scrape somehow corrupted the variable and caused an error when opening the
-		//amalgamation settings dialog
-		allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences.initializeValuesFromPreferenceFile();
-		return allAmalgamationOrderingPreferences;
-	}
-
-	public void setAllAmalgamationOrderingPreferences(AllAmalgamationOrderingPreferences allAmalgamationOrderingPreferences) {
-		this.allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences;
+	public List<Amalgamation> getAllAmalgamations() {
+		return amalg;
 	}
 
 	public void enableFileWrite() {

@@ -59,13 +59,6 @@ public class Data18MovieParsingProfile extends SiteParsingProfile implements Spe
 	private static HashMap<String, String> releaseDateMap;
 
 	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.AMERICAN_ADULT_DVD_SCRAPER_GROUP);
-		return groupNames;
-	}
-
-	@Override
 	public Title scrapeTitle() {
 		Element titleElement = document.select("div#centered.main2 div h1").first();
 		if (titleElement != null)

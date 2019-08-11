@@ -54,13 +54,6 @@ public class DmmParsingProfile extends SiteParsingProfile implements SpecificPro
 	private boolean doGoogleTranslation;
 	private boolean scrapeTrailers;
 
-	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.JAV_CENSORED_SCRAPER_GROUP);
-		return groupNames;
-	}
-
 	public DmmParsingProfile() {
 		super();
 		doGoogleTranslation = (scrapingLanguage == Language.ENGLISH);

@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 
 import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfile;
-import moviescraper.doctord.controller.siteparsingprofile.SiteParsingProfile.ScraperGroupName;
 import moviescraper.doctord.model.Movie;
 import moviescraper.doctord.model.dataitem.DataItemSource;
 import moviescraper.doctord.view.ScrapeAmalgamatedProgressDialog;
@@ -28,27 +29,25 @@ public class ScrapeAmalgamatedMovieWorker extends SwingWorker<Void, Map<SitePars
 	int numberOfScrapesFinished = 0;
 	private Map<String, SwingWorker<Void, Void>> runningWorkers;
 	private File fileToScrape;
+	List<SiteParsingProfile> scrapers;
 
-	private AllAmalgamationOrderingPreferences allAmalgamationOrderingPreferences;
-	private ScraperGroupAmalgamationPreference scraperGroupAmalgamationPreference;
 	private ScrapeAmalgamatedProgressDialog parent;
 
 	/**
-	 * @param allAmalgamationOrderingPreferences
-	 * @param guiMain
-	 * @param scraperGroupAmalgamationPreference
+	 *
+	 * @param scrapers
+	 * @param parent
 	 * @param fileToScrape - file scraped if no gui (if there is a gui we use the state variable from there wich is the file to scrape)
 	 */
-	public ScrapeAmalgamatedMovieWorker(AllAmalgamationOrderingPreferences allAmalgamationOrderingPreferences, ScraperGroupAmalgamationPreference scraperGroupAmalgamationPreference, File fileToScrape,
-	        ScrapeAmalgamatedProgressDialog parent) {
+	public ScrapeAmalgamatedMovieWorker(List<SiteParsingProfile> scrapers, File fileToScrape, ScrapeAmalgamatedProgressDialog parent) {
 		runningWorkers = new HashMap<>();
 		progress = 0;
 		amountOfProgressPerSubtask = 0;
 		scrapeCanceled = false;
-		this.scraperGroupAmalgamationPreference = scraperGroupAmalgamationPreference;
+		this.scrapers = scrapers;
 		this.fileToScrape = fileToScrape;
 		this.parent = parent;
-		this.allAmalgamationOrderingPreferences = allAmalgamationOrderingPreferences;
+		System.out.println("New worker with"+scrapers);
 	}
 
 	SwingWorker<Void, Void> getWorkerByScraperName(SiteParsingProfile scraper) {
@@ -76,36 +75,11 @@ public class ScrapeAmalgamatedMovieWorker extends SwingWorker<Void, Map<SitePars
 		}
 	}
 
-	/*
-	 * private static void failIfInterrupted() throws InterruptedException {
-	 * if (Thread.currentThread().isInterrupted()) {
-	 * throw new InterruptedException("Interrupted while searching files");
-	 * }
-	 * }
-	 */
-
-	/**
-	 * @param parsingProfile - item to check if scraping is enabled for this parsing profile
-	 * @return true if scraper should scrape for parsingProfile, false otherwise
-	 */
-	private boolean shouldScrapeThread(DataItemSource parsingProfile) {
-		//Default group used for site specific scraping - always want to return true since there's just one thread to scrape
-		if (scraperGroupAmalgamationPreference.getScraperGroupName().equals(ScraperGroupName.DEFAULT_SCRAPER_GROUP))
-			return true;
-		for (ScraperGroupName currentName : ScraperGroupName.values()) {
-			ScraperGroupAmalgamationPreference currentPref = allAmalgamationOrderingPreferences.getScraperGroupAmalgamationPreference(currentName);
-
-			LinkedList<DataItemSource> overallPrefs = currentPref.getOverallAmalgamationPreference().getAmalgamationPreferenceOrder();
-
-			for (DataItemSource currentDataItemSource : overallPrefs) {
-				if (currentDataItemSource.getDataItemSourceName().equals(parsingProfile.getDataItemSourceName())) {
-					boolean disabled = currentDataItemSource.isDisabled();
-					return !disabled;
-				}
-			}
+	private static void failIfInterrupted() throws InterruptedException {
+		if (Thread.currentThread().isInterrupted()) {
+		  throw new InterruptedException("Interrupted while searching files");
 		}
-		return false;
-	}
+	  }
 
 	@Override
 	protected Void doInBackground() {
@@ -116,34 +90,32 @@ public class ScrapeAmalgamatedMovieWorker extends SwingWorker<Void, Map<SitePars
 		//failIfInterrupted();
 
 		//get the latest version of the sraper group preference - if it's not there for whatever reason (usually from a specific scrape), just leave it alone
-		ScraperGroupAmalgamationPreference scraperGroupAmalgamationPreferenceNew = allAmalgamationOrderingPreferences
-		        .getScraperGroupAmalgamationPreference(scraperGroupAmalgamationPreference.getScraperGroupName());
+		/*ScraperGroupAmalgamationPreference scraperGroupAmalgamationPreferenceNew = allAmalgamationOrderingPreferences
+				.getScraperGroupAmalgamationPreference(scraperGroupAmalgamationPreference.getScraperGroupName());
 		if (scraperGroupAmalgamationPreferenceNew != null)
 			scraperGroupAmalgamationPreference = scraperGroupAmalgamationPreferenceNew;
-
-		LinkedList<DataItemSource> scraperList = scraperGroupAmalgamationPreference.getOverallAmalgamationPreference().getAmalgamationPreferenceOrder();
+*/
+		//LinkedList<DataItemSource> scraperList = scraperGroupAmalgamationPreference.getOverallAmalgamationPreference().getAmalgamationPreferenceOrder();
 		//calculate progress amount per worker
 
-		for (DataItemSource currentScraper : scraperList) {
-			if (shouldScrapeThread(currentScraper) && currentScraper instanceof SiteParsingProfile)
+		for (DataItemSource currentScraper : scrapers) {
+			if (currentScraper instanceof SiteParsingProfile)
 				numberOfScrapes++;
 		}
 
+		System.out.println(""+numberOfScrapes+" scrapers");
 		if (numberOfScrapes == 0) {
 			progressAmountPerWorker = 100;
 		} else {
 			progressAmountPerWorker = 100 / numberOfScrapes;
 		}
 
-		for (DataItemSource currentScraper : scraperList) {
+		for (DataItemSource currentScraper : scrapers) {
 			//We don't want to read any leftover properties from our JSON - we want to start fresh so things like scraping language do not get set in our scraper
 			currentScraper = currentScraper.createInstanceOfSameType();
 			if (currentScraper instanceof SiteParsingProfile) {
-
-				if (shouldScrapeThread(currentScraper)) {
 					scrapeMovieInBackground(fileToScrape, currentScraper, progressAmountPerWorker);
 					numberOfScrapesToRun++;
-				}
 			}
 		}
 
@@ -151,7 +123,7 @@ public class ScrapeAmalgamatedMovieWorker extends SwingWorker<Void, Map<SitePars
 
 		//System.out.println("returnMovie is " + returnMovie);
 
-		//setProgress(100);
+		setProgress(100);
 
 		return null;
 	}

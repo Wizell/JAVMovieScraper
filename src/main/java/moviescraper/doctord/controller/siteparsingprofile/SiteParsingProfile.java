@@ -60,39 +60,6 @@ import moviescraper.doctord.view.GUIMain;
 
 public abstract class SiteParsingProfile implements DataItemSource {
 
-	/*
-	 * Any group of SiteParsingProfiles which return the same type of information for a given file and which
-	 * will be compatible for amalgamation should return the same ScraperGroupName by implementing getScraperGroupName()
-	 */
-	public enum ScraperGroupName {
-		JAV_CENSORED_SCRAPER_GROUP {
-			@Override
-			public String toString() {
-				return "JAV Censored Group";
-			}
-		},
-		AMERICAN_ADULT_DVD_SCRAPER_GROUP {
-			@Override
-			public String toString() {
-				return "American Adult DVD";
-			}
-		},
-		DEFAULT_SCRAPER_GROUP {
-			@Override
-			public String toString() {
-				return "Default Group";
-			}
-		}
-	}
-
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.DEFAULT_SCRAPER_GROUP);
-		return groupNames;
-	}
-
-	protected List<ScraperGroupName> groupNames;
-
 	protected Language scrapingLanguage;
 
 	public Document document; // the base page to start parsing from
@@ -433,6 +400,7 @@ public abstract class SiteParsingProfile implements DataItemSource {
 	}
 
 	/**
+	 *
 	 * @return - null if no file has been scraped yet or the file name of the scraped movie used in {@link #createSearchString(File)} method
 	 */
 	public String getFileNameOfScrapedMovie() {

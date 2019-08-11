@@ -43,13 +43,6 @@ public class SquarePlusParsingProfile extends SiteParsingProfile implements Spec
 
 	private static final SimpleDateFormat squarePlusReleaseDateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 
-	@Override
-	public List<ScraperGroupName> getScraperGroupNames() {
-		if (groupNames == null)
-			groupNames = Arrays.asList(ScraperGroupName.JAV_CENSORED_SCRAPER_GROUP);
-		return groupNames;
-	}
-
 	public SquarePlusParsingProfile(Document document) {
 		super(document);
 	}
